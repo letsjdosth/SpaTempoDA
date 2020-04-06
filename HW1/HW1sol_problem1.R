@@ -85,7 +85,7 @@ print(test3_Sigma)
 test_suite_for_2d(test3_mu, test3_Sigma)
 
 
-# test 3 : with Matern covariance (big nu)
+# test 4 : with Matern covariance (big nu)
 test4_mu = c(1, -1)
 
 # library(fields)
