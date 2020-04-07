@@ -1,3 +1,12 @@
+# R code created by Choi Seokjun
+# UTF-8 CRLF
+# windows 10 64-bit.
+# R 3.5.2
+
+# vscode run as source : ctrl+shift+s
+# vscode run selected block only : ctrl+enter
+
+
 # 2. The file CAtemps.RData contains two R objects of class SpatialPointsDataFrame, called CAtemp and CAgrid. 
 # CAtemp contains average temperatures from 1961-1990 at 200 locations (latitude and longitude) in California in degrees Fahrenheit, 
 # along with their elevations in meters. CAgrid contains elevations in meters over a grid of locations. 
