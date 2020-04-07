@@ -187,12 +187,26 @@ pred_cross_cov_mat = pred_cov_cross_gamma * s2.hat
 
 
 
-#krigging
+#krigging mean
 pred_Y = pred_mu + t(pred_cross_cov_mat) %*% inv_cov_mat %*% (gls.Y - gls.X%*%gls.beta)
 dim(pred_Y)
 CAgrid$pred.temp = pred_Y
 
+# sd of Z
+pred_Y_var_mat = pred_inner_cov_mat - t(pred_cross_cov_mat) %*% inv_cov_mat %*% pred_cross_cov_mat
+dim(pred_Y_var_mat) #664 664
+pred_Y_var = diag(pred_Y_var_mat)
+CAgrid$pred.sd.temp = sqrt(pred_Y_var)
+
+# mse
+cal_b = t(pred_X) - t(gls.X) %*% inv_cov_mat %*% pred_cross_cov_mat
+pred_mse_mat = pred_Y_var_mat + t(cal_b) %*% solve(t(gls.X) %*% inv_cov_mat %*% gls.X) %*% cal_b
+pred_mse = diag(pred_mse_mat)
+CAgrid$pred.mse.temp = pred_mse
+
+
 # Plotting
+#mean
 range(pred_Y)
 breaks = 30:75
 x11()
@@ -202,4 +216,25 @@ ploteqc(CAgrid, CAgrid$pred.temp, breaks, pch = 19)
 map("county", region = "california", add = TRUE)
 title(main = "Predicted Average Annual Temperatures, 1961-1990, Degrees F")
 
+
+#std
+quantile(pred_Y_std)
+breaks = seq(2, 2.7, length.out=40)
+x11()
+plot.new()
+
+ploteqc(CAgrid, CAgrid$pred.sd.temp, breaks, pch = 19)
+map("county", region = "california", add = TRUE)
+title(main = "Std of Predicted Average Annual Temperatures, 1961-1990, Degrees F")
+
+
+#mse
+quantile(pred_mse)
+breaks = seq(7, 7.3, length.out=50)
+x11()
+plot.new()
+
+ploteqc(CAgrid, CAgrid$pred.mse.temp, breaks, pch = 19)
+map("county", region = "california", add = TRUE)
+title(main = "MSE of Predicted Average Annual Temperatures, 1961-1990, Degrees F")
 
