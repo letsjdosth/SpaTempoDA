@@ -84,8 +84,7 @@ Write a function or a few lines of code in R to implement this method
 for arguments mu and Sigma. You may use the built-in function chol for the Cholesky decomposition and rnorm to generate Z.
 }
 
-Here is implementation. 
-Also you may see the 'HW1sol\_problem.R' file.
+Here is implementation of the key part.
 
 \begin{Rcode}
     \begin{verbatim}
@@ -196,7 +195,7 @@ This is important because we want to predict \(\mu(s_i;\beta)+Z(s_i;\sigma^2,\rh
 Before solving the problems, Let's see the data. Here is average temperature plot of CAtemp.
 \begin{figure}[!h]
     \centering
-    \includegraphics[height=6cm]{prob2_CAtemp_avgtemp.png}
+    \includegraphics[height=8cm]{prob2_CAtemp_avgtemp.png}
     \caption{average temperature data in CAtemp}
 \end{figure}
 We can find that data points are relatively sparse at upper-right, middle-right and lower-right region.
@@ -228,7 +227,7 @@ where \(\mu(s_i;\beta)=\beta_0+\beta_1 Longitude(s) + \beta_2 Latitude(s)+\beta_
 And, the residual at each data point is plotted.
 \begin{figure}[!h]
     \centering
-    \includegraphics[height=6cm]{prob2_CAtemp_ols_residual.png}
+    \includegraphics[height=8cm]{prob2_CAtemp_ols_residual.png}
     \caption{the residuals of OLS}
 \end{figure}
 
@@ -250,7 +249,7 @@ Here is the key code to get non-parametric variogram. I choose the width to 50.
 
 \begin{Rcode}
     \begin{verbatim}
-vg = variogram(ols.residual ~ 1, data = CAtemp, width=50) # What happens when we change the bin width?
+vg = variogram(ols.residual ~ 1, data = CAtemp, width=50)
 print(plot(vg, xlab = "Distance", ylab = "Semi-variogram estimate"))
 
 vgangle = variogram(ols.residual ~ 1, data = CAtemp, alpha = c(0, 45, 90, 135))
@@ -263,8 +262,8 @@ So, you may ignore it.)
 The plots are here. 
 \begin{figure}[!h]
     \centering
-    \includegraphics[height=6cm]{prob2_CAtemp_variogram.png}
-    \includegraphics[height=6cm]{prob2_CAtemp_variogram_angle.png}
+    \includegraphics[height=8cm]{prob2_CAtemp_variogram.png}
+    \includegraphics[height=8cm]{prob2_CAtemp_variogram_angle.png}
     \caption{nonparametric variogram fit}
 \end{figure}
 
@@ -292,8 +291,8 @@ Below is the result plot.
 
 \begin{figure}[!h]
     \centering
-    \includegraphics[height=6cm]{prob2_CAtemp_variogram.png}
-    \includegraphics[height=6cm]{prob2_CAtemp_variogram_exp_fit.png}
+    \includegraphics[height=8cm]{prob2_CAtemp_variogram.png}
+    \includegraphics[height=8cm]{prob2_CAtemp_variogram_exp_fit.png}
     \caption{the variogram fitted to the exponential model}
 \end{figure}
 
@@ -447,9 +446,9 @@ The result plots of predicted temperature values and MSE values for each locatio
 For convenience, I attach original data plot one more time.
 
 \begin{figure}[!h]
-    \includegraphics[height=6cm]{prob2_CAtemp_avgtemp.png} \\
-    \includegraphics[height=6cm]{prob2_CAgrid_predicted_mean.png}
-    \includegraphics[height=6cm]{prob2_CAgrid_predicted_MSE.png}
+    \includegraphics[height=8cm]{prob2_CAtemp_avgtemp.png} \\
+    \includegraphics[height=8cm]{prob2_CAgrid_predicted_mean.png}
+    \includegraphics[height=8cm]{prob2_CAgrid_predicted_MSE.png}
     \caption{the temperatures of original data(up), 
     \\ the predicted temperatures by krigging(down-left), and MSEs by krigging(down-right)}
 \end{figure}
