@@ -42,8 +42,8 @@
 
 Note: \\
 You can get full, run-able code files at my github page: Visit https://github.com/letsjdosth/SpaTempoDA \\
-Because I provide the full code file separately, in this report,
-I will show key-code block only instead of bringing the full, verbose code.
+Because I provide the full code file separately, in this report 
+I will show key-code blocks only instead of bringing the full, verbose code.
 
 \section{Problem 1}
 \textbf{
@@ -110,54 +110,134 @@ These differences will be easier to see if you keep the same Z sample but just c
 }
 
 For convenience, I use fields\$Matern function to calculate covariance matrix from parameters of Matern.
-Here are 3 test cases. (In full code, there are one more case for ordinary(not Matern) GP.)
+And for easy visualization, I will make only 2 dimensional chain.
+Here are 3 test cases. (In full code, there is one more case for ordinary(not Matern) GP.)
+
+Fix $\rho$ to 1. And,
 \begin{itemize}
     \item $\nu = 0.1$ (in code, test 3)
-    \item $\nu = 0.5$ (in code, test 2)
+    The covariance matrix becomes
+    \[\begin{bmatrix}
+        1 & 0.98 \\ 0.98 & 1
+    \end{bmatrix}
+    \]
+    \item $\nu = 0.5$ (in code, test 2) : exponential covariance. 
+    The covariance matrix becomes
+    \[\begin{bmatrix}
+        1 & 0.90 \\ 0.90 & 1
+    \end{bmatrix}
+    \]
     \item $\nu = 1$ (in code, test 4)
+    The covariance matrix becomes
+    \[\begin{bmatrix}
+        1 & 0.81 \\ 0.81 & 1
+    \end{bmatrix}
+    \]
 \end{itemize}
-Note that $\nu = 0.5$ case is the exponential covariance.
 
-
-
-\begin{figure}[hh]
+I generate 5 (different) chains at each $\nu$s.
+\begin{figure}[!h]
     \centering
-    \includegraphics[height=8cm]{prob1_test3_scatter.png}
-    \includegraphics[height=8cm]{prob1_test3_traceplot.png}
-    \caption{$\nu=0.1$}
+    \includegraphics[height=5cm]{prob1_test3_many_process_traceplot.png}
+    \includegraphics[height=5cm]{prob1_test2_many_process_traceplot.png}
+    \includegraphics[height=5cm]{prob1_test4_many_process_traceplot.png}
+    \caption{left: $\nu=0.1$, middle: $\nu=0.5$, right: $\nu=1$}
 \end{figure}
 
 
+\clearpage
+Nextly, I generate one chain longer, and get scatter-plot and trace-plot.
+\begin{figure}[!h]
+    \centering
+    \includegraphics[height=6cm]{prob1_test3_oneprocess_scatter.png}
+    \includegraphics[height=6cm]{prob1_test3_oneprocess_traceplot.png}
+    \caption{$\nu=0.1$}
+% \end{figure}
+% \begin{figure}[hh]
+    \centering
+    \includegraphics[height=6cm]{prob1_test2_oneprocess_scatter.png}
+    \includegraphics[height=6cm]{prob1_test2_oneprocess_traceplot.png}
+    \caption{$\nu=0.5$}
+% \end{figure}
+% \begin{figure}[hh]
+    \centering
+    \includegraphics[height=6cm]{prob1_test4_oneprocess_scatter.png}
+    \includegraphics[height=6cm]{prob1_test4_oneprocess_traceplot.png}
+    \caption{$\nu=1$}
+\end{figure}
+
+By changing $\nu$, the calculated covariance matrices are affected,
+and the effects are confirmed by the scatter-plot and trace-plot.
 
 
+\newpage
 \section{Problem 2}
+\textbf{
 The file CAtemps.RData contains two R objects of class SpatialPointsDataFrame, called CAtemp and CAgrid.
 CAtemp contains a average temperatures from 1961-1990 at 200 locations (latitude and longitude) in California in degrees Fahrenheit, along with their elevation in meters.
 CAgrid contains elevations in meters over a grid of locations.
 I've given you some code to get started with this data in HW1.R
-
+}
+\textbf{
 Consider the following model for the temperature data.
 \[Y_i = \mu(s_i;\beta) + e(s_i; \sigma^2, \rho, \tau)\]
 where \(\mu(s_i;\beta)=\beta_0+\beta_1 Longitude(s) + \beta_2 Latitude(s)
 +\beta_3 Elevation(s)\) and \(e(s_i;\sigma^2,\rho,\tau)\) is a zero mean stationary Gaussian process with
 exponential covariance function.
-
+}
+\textbf{
 Another way of writing this is as
 \[Y_i = \mu(s_i;\beta) + Z(s_i; \sigma^2, \rho) + \epsilon_i\]
 where now $Z$ is mean zero Gaussian process like $e$ but without the nugget term,
 and the $\epsilon$ are iid $N(0,\tau^2)$, independent of Z.
 This is important because we want to predict \(\mu(s_i;\beta)+Z(s_i;\sigma^2,\rho)\) without the measurement error.
+}
+
+Before solving the problems, Let's see the data. Here is average temperature plot of CAtemp.
+\begin{figure}[!h]
+    \centering
+    \includegraphics[height=6cm]{prob2_CAtemp_avgtemp.png}
+    \caption{average temperature data in CAtemp}
+\end{figure}
+We can find that data points are relatively sparse at upper-right, middle-right and lower-right region.
 
 
-
+\clearpage
 \subsection{Problem 2-(a)}
 \textbf{
 Using the CAtemp data, form a preliminary estimate of $\beta$ using ordinary least squares 
 and make a color plot of the residuals.
 Include your estimates and plot.
 }
+It is easy work if we use built-in lm function of R.
+Load the CAtemps.Rdata and run this code to get what we want.
+\begin{Rcode}
+    \begin{verbatim}
+ols = lm(avgtemp~lon+lat+elevation, data=CAtemp)
+print(ols$coeff) #estimates
+CAtemp$ols.residual = ols$residual
+    \end{verbatim}
+\end{Rcode}
+The results of the ordinary least squares' coefficients calculated by R are
+\[\hat{\beta}_{0:OLS}=321.5114\]
+\[\hat{\beta}_{1:OLS}=2.324105\]
+\[\hat{\beta}_{2:OLS}=0.5646805\]
+\[\hat{\beta}_{3:OLS}=-0.009648649\]
+where \(\mu(s_i;\beta)=\beta_0+\beta_1 Longitude(s) + \beta_2 Latitude(s)+\beta_3 Elevation(s)\).
+
+And, the residual at each data point is plotted.
+\begin{figure}[!h]
+    \centering
+    \includegraphics[height=6cm]{prob2_CAtemp_ols_residual.png}
+    \caption{the residuals of OLS}
+\end{figure}
+
+Be careful, 0 is colored by light-green.
+
+We can find that there are some patterns in residuals. So we have to doubt to exist some dependencies in this data.
 
 
+\clearpage
 \subsection{Problem 2-(b)}
 \textbf{
 Estimate the variogram non-parametrically and then fit the exponential variogram to it using weighted least squares.
@@ -165,7 +245,64 @@ Make and include a plot of the nonparametric and parametric variogram functions.
 Also store your parameter estimates and report them.
 }
 
+For variogram, I use the 'variogram' function of gstat package in R. Then, the code become (magically) simple.
+Here is the key code to get non-parametric variogram. I choose the width to 50.
 
+\begin{Rcode}
+    \begin{verbatim}
+vg = variogram(ols.residual ~ 1, data = CAtemp, width=50) # What happens when we change the bin width?
+print(plot(vg, xlab = "Distance", ylab = "Semi-variogram estimate"))
+
+vgangle = variogram(ols.residual ~ 1, data = CAtemp, alpha = c(0, 45, 90, 135))
+print(plot(vgangle, xlab = "Distance", ylab = "Semi-variogram estimate"))
+    \end{verbatim}
+\end{Rcode}
+(The print function call is needed to save the plot when I run this code in the console, not in the interactive interpreter.
+So, you may ignore it.)
+
+The plots are here. 
+\begin{figure}[!h]
+    \centering
+    \includegraphics[height=6cm]{prob2_CAtemp_variogram.png}
+    \includegraphics[height=6cm]{prob2_CAtemp_variogram_angle.png}
+    \caption{nonparametric variogram fit}
+\end{figure}
+
+The brief shape of variogram is not a flat line, so the doubt above is proper as we see here, too.
+And, since the shapes of the rotated variograms also have same shapes, the result doesn't have a big problem.
+
+Next, I will fit the variogram to exponential variogram model.
+Again, the gstat package in R make our problem very simple. I will use 'fit.variogram' function in the package.
+
+\begin{Rcode}
+    \begin{verbatim}
+fitvg = fit.variogram(vg, vgm(1, "Exp", range=300, nugget=3)) 
+
+# estimated parameters of variance term
+s2.hat = fitvg$psill[2]
+rho.hat = fitvg$range[2]
+tau2.hat = fitvg$psill[1]
+
+# plot
+print(plot(vg, fitvg, xlab = "Distance", ylab = "Semi-variogram estimate"))
+    \end{verbatim}
+\end{Rcode}
+
+Below is the result plot.
+
+\begin{figure}[!h]
+    \centering
+    \includegraphics[height=6cm]{prob2_CAtemp_variogram.png}
+    \includegraphics[height=6cm]{prob2_CAtemp_variogram_exp_fit.png}
+    \caption{the variogram fitted to the exponential model}
+\end{figure}
+
+And, the estimated parameter values of covariance's using the least square method are,
+\[\hat{\sigma}^2 = 4.635655\]
+\[\hat{\rho} = 115.7653\]
+\[\hat{\tau}^2 = 2.434879\]
+
+\clearpage
 \subsection{Problem 2-(c)}
 \textbf{
 We will now form the GLS estimate of $\beta$ by hand, rather than using the gls function.
@@ -178,7 +315,72 @@ We will now form the GLS estimate of $\beta$ by hand, rather than using the gls 
 \end{itemize}
 }
 
+I implement the code of GLS by hand. 
 
+To get miles-distance matrix from (lat,lon) data, I use the chordal distance.
+And, following the direction of problem, I use exponential covariance function to make the covariance matrix.
+\begin{Rcode}
+    \begin{verbatim}
+make_chordaldist_u1u2_for_rdist = function(lat, lon){
+    mean_earth_radius_in_miles = 3958.8 #by google
+    chordaldist_x = mean_earth_radius_in_miles * cos(lat) * cos(lon)
+    chordaldist_y = mean_earth_radius_in_miles * cos(lat) * sin(lon)
+    chordaldist_z = mean_earth_radius_in_miles * sin(lat)
+    chordaldist_mat = cbind(chordaldist_x, chordaldist_y, chordaldist_z)
+    return(chordaldist_mat)
+}
+    
+make_EXPcov_mat_without_nugget = function(dist_mat, rho, sigma_sqaure){
+    #lecture note 1-2. page 40
+    num_row = dim(dist_mat)[1] 
+    num_col = dim(dist_mat)[2]
+    cov_gamma = matrix(0, num_row, num_col)
+    for(i in 1:num_row){
+        for(j in 1:num_col){
+            cov_gamma[i,j] = exp(-dist_mat[i,j] * rho)
+        }
+    }
+    cov_gamma = cov_gamma * sigma_sqaure
+    return(cov_gamma)
+}
+    
+# make distance matrix
+CAtemp_data_u1u2= make_chordaldist_u1u2_for_rdist(CAtemp$lat, CAtemp$lon)
+CAtemp_data_dist_mat = rdist(CAtemp_data_u1u2, CAtemp_data_u1u2)
+# dim(dist_mat) # 200 200
+# max(dist_mat)
+# min(dist_mat)
+
+
+# make covariance matrix
+CAtemp_data_cov_spatial = make_EXPcov_mat_without_nugget(CAtemp_data_dist_mat, rho.hat, s2.hat)
+CAtemp_data_cov_nugget = diag(200) * tau2.hat
+CAtemp_data_cov_mat = CAtemp_data_cov_spatial + CAtemp_data_cov_nugget
+
+
+# gls fit
+b0 = rep(1,200)
+gls.X = as.matrix(data.frame(b0, CAtemp$lon, CAtemp$lat, CAtemp$elevation))
+gls.Y = as.matrix(CAtemp$avgtemp)
+CAtemp_data_inv_cov_mat = solve(CAtemp_data_cov_mat)
+gls.beta = solve(t(gls.X) %*% CAtemp_data_inv_cov_mat %*% gls.X) %*% t(gls.X) %*% CAtemp_data_inv_cov_mat %*% gls.Y
+print("gls coefficients")
+cat('(Intercept)    lon       lat    elevation\n',gls.beta,'\n')
+print('----------------')
+    \end{verbatim}
+\end{Rcode}
+
+The results of the GLS' coefficients calculated by R are
+\[\hat{\beta}_{0:GLS}=321.5114\]
+\[\hat{\beta}_{1:GLS}=2.324105\]
+\[\hat{\beta}_{2:GLS}=0.5646805\]
+\[\hat{\beta}_{3:GLS}=-0.009647649\]
+where \(\mu(s_i;\beta)=\beta_0+\beta_1 Longitude(s) + \beta_2 Latitude(s)+\beta_3 Elevation(s)\).
+
+They are not differ drastically, but maybe OLS model affects more to the standard error of the estimates comparing to OLS model.
+
+
+\clearpage
 \subsection{Problem 2-(d)}
 \textbf{
 Calculate and plot the EBLUP of $\mu+Z$ at the location in CAgrid,
@@ -186,55 +388,75 @@ plugging in your estimates from (b) and (c).
 Calculate and plot the (estimated) standard error of $Z$ at each prediction location
 }
 
+I calculate MSE rather than standard error, because their roles simillar,
+but it shows more interesting things than estimated standard error in this case.
 
-Since $Z \sim N(0, C)$, by definition of functional distribution in weak sense,
-\(\langle Z, x\rangle \sim N(\langle 0,x \rangle, \langle C(x),x\rangle)\) for all $x\in \mathcal{H}=\mathcal{L}^2([0,1])$.
-So, with eigenfunctions $\{v_i\}$, we get multivariate normal distribution for
-\[\{\langle Z, v_i\rangle\}_{i=1,2,...,m} \sim Normal_m(
-\begin{bmatrix}
-    \langle 0,v_1 \rangle \\
-    \langle 0,v_2 \rangle \\
-    ... \\
-    \langle 0,v_m \rangle
-\end{bmatrix}
-,
-\begin{bmatrix}
-    \langle C(v_1),v_1 \rangle & \langle C(v_1),v_2 \rangle & ... & \langle C(v_1),v_m \rangle \\
-    \langle C(v_2),v_1 \rangle & \langle C(v_2),v_2 \rangle & ... & \langle C(v_2),v_m \rangle \\
-    ... \\
-    \langle C(v_m),v_1 \rangle & \langle C(v_m),v_2 \rangle & ... & \langle C(v_m),v_m \rangle \\
-\end{bmatrix}
-)\]
-For simplicity, denote above expression's covariance matrix as $\Sigma_m$. Then we simply write above as
-\[\{\langle Z, v_i\rangle\}_{i=1,2,...,m} \sim Normal_m(0,\Sigma_m)\]
-Since the pdf of multivariate normal is well known, I write it without additional explanation.
-If denote the vector \([\langle Z, v_i\rangle]_i, i=1,2,...,m\) as $z_m$, then
-\[
-    f_m(z_m) = \frac{1}{(\sqrt{2\pi})^m det(\Sigma_m)}exp{(-\frac{1}{2}(z_m-0)^T\Sigma_m^{-1}(z_m-0))}
-\]
+I will re-use the calculated value and R-functions to get EBLUP and MSE.
+Key parts of the code are here.
 
-Likewise, since $X:=\mu+Z$,
-\[\{\langle X, v_i\rangle\}_{i=1,2,...,m} \sim Normal_m(
-\begin{bmatrix}
-    \langle \mu,v_1 \rangle \\
-    \langle \mu,v_2 \rangle \\
-    ... \\
-    \langle \mu,v_m \rangle
-\end{bmatrix}
-,
-\begin{bmatrix}
-    \langle C(v_1),v_1 \rangle & \langle C(v_1),v_2 \rangle & ... & \langle C(v_1),v_m \rangle \\
-    \langle C(v_2),v_1 \rangle & \langle C(v_2),v_2 \rangle & ... & \langle C(v_2),v_m \rangle \\
-    ... \\
-    \langle C(v_m),v_1 \rangle & \langle C(v_m),v_2 \rangle & ... & \langle C(v_m),v_m \rangle \\
-\end{bmatrix}
-)\]
-with denoting the mean vector as $\mu_m$ covariance matrix as $\Sigma_m$. Then we simply write above as
-\[\{\langle X, v_i\rangle\}_{i=1,2,...,m} \sim Normal_m(\mu_m,\Sigma_m)\]
-and pdf is, where \(x_m=[\langle X, v_i\rangle]_i, i=1,2,...,m\),
-\[
-    f_m(x_m) = \frac{1}{(\sqrt{2\pi})^m det(\Sigma_m)}exp{(-\frac{1}{2}(x_m-\mu_m)^T\Sigma_m^{-1}(x_m-\mu_m))}
-\]
 
+\begin{Rcode}
+    \begin{verbatim}
+# make m0(=pred_mu) term(in lec2-2. page38)
+pred_X = as.matrix(data.frame(rep(1,664), CAgrid$lon, CAgrid$lat, CAgrid$elevation))
+pred_mu = pred_X %*% gls.beta
+dim(pred_mu)
+head(pred_mu)
+
+
+# make covariance matrix
+#inner
+CAgrid_data_u1u2= make_chordaldist_u1u2_for_rdist(CAgrid$lat, CAgrid$lon)
+pred_inner_dist_mat = rdist(CAgrid_data_u1u2, CAgrid_data_u1u2)
+
+pred_cov_spatial = make_EXPcov_mat_without_nugget(pred_inner_dist_mat, rho.hat, s2.hat)
+# pred_cov_nugget = diag(664) * tau2.hat #no nugget term!
+pred_inner_cov_mat = pred_cov_spatial #+ pred_cov_nugget #no nugget term!
+
+
+#cross
+pred_cross_dist_mat = rdist(CAtemp_data_u1u2, CAgrid_data_u1u2)
+dim(pred_cross_dist_mat) # 200, 664
+pred_cross_cov_mat = make_EXPcov_mat_without_nugget(pred_cross_dist_mat, rho.hat, s2.hat)
+
+
+## krigging mean
+pred_Y = pred_mu + 
+    t(pred_cross_cov_mat) %*% CAtemp_data_inv_cov_mat %*% (gls.Y - gls.X%*%gls.beta)
+dim(pred_Y)
+CAgrid$pred.temp = pred_Y
+
+# sd (I'll skip this. Instead, I'll find mse.)
+pred_Y_var_mat = pred_inner_cov_mat - 
+    (pred_cross_cov_mat) %*% CAtemp_data_inv_cov_mat %*% pred_cross_cov_mat
+# dim(pred_Y_var_mat) #664 664
+# pred_Y_var = diag(pred_Y_var_mat)
+# CAgrid$pred.sd.temp = sqrt(pred_Y_var)
+
+# predicting mse
+cal_b = t(pred_X) - t(gls.X) %*% CAtemp_data_inv_cov_mat %*% pred_cross_cov_mat
+pred_mse_mat = pred_Y_var_mat + 
+    t(cal_b) %*% solve(t(gls.X) %*% CAtemp_data_inv_cov_mat %*% gls.X) %*% cal_b
+pred_mse = diag(pred_mse_mat)
+CAgrid$pred.mse.temp = pred_mse
+    \end{verbatim}
+\end{Rcode}
+
+\clearpage
+The result plots of predicted temperature values and MSE values for each location in CAgrid are here.
+For convenience, I attach original data plot one more time.
+
+\begin{figure}[!h]
+    \includegraphics[height=6cm]{prob2_CAtemp_avgtemp.png} \\
+    \includegraphics[height=6cm]{prob2_CAgrid_predicted_mean.png}
+    \includegraphics[height=6cm]{prob2_CAgrid_predicted_MSE.png}
+    \caption{the temperatures of original data(up), 
+    \\ the predicted temperatures by krigging(down-left), and MSEs by krigging(down-right)}
+\end{figure}
+
+We can find that the krigging is quite well enough to explain the original temperature values
+around the original data point's values. 
+And, I should emphasize that the region of sparse data points has relatively higher MSE
+than the region of dense data points. It is reasonable.
 
 \end{document}
