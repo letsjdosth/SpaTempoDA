@@ -3,7 +3,7 @@
 # windows 10 64-bit.
 # R 3.5.2
 
-# Note: much part of this code is reconstructed from Park's code.
+# Note: many parts of this code is reconstructed from Park's code.
 
 # 2. The file CAtemps.RData contains two R objects of class SpatialPointsDataFrame, called CAtemp and CAgrid. 
 # CAtemp contains average temperatures from 1961-1990 at 200 locations (latitude and longitude) in California in degrees Fahrenheit, 
