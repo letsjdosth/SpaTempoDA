@@ -33,7 +33,7 @@ rnorm_chol_algorithm = function(mu, Sigma) {
     return(mu + t(chol_upperL) %*% vecZ)    
 }
 
-test_suite_for_2d = function(mu_2dim, cov_2by2dim, sim_num=10000){
+test_suite_for_2d = function(mu_2dim, cov_2by2dim, sim_num=10000, test_idx_str=""){
     test_result_x1 = rep(0, sim_num)
     test_result_x2 = rep(0, sim_num)
     for(i in 1:sim_num){
@@ -41,13 +41,21 @@ test_suite_for_2d = function(mu_2dim, cov_2by2dim, sim_num=10000){
         test_result_x1[i] = iter_sample[1]
         test_result_x2[i] = iter_sample[2]
     }
-    par(mfrow=c(3,1))
+    x11()
+    par(mfrow=c(1,1))
     plot(test_result_x1, test_result_x2, main='scatterplot', xlab='1st dim', ylab='2nd dim')
+    dev.copy(png, filename=paste("C:/gitProject/SpaTempoDA/HW1/prob1_test",test_idx_str,"_oneprocess_scatter.png", sep = ""))
+    dev.off()
+    
+    x11()
+    par(mfrow=c(2,1))
     plot(seq(0,1,length.out=sim_num), test_result_x1, type='l', xlab='iteration(normalized)', ylab='value', main='1st dim')
     plot(seq(0,1,length.out=sim_num), test_result_x2, type='l', xlab='iteration(normalized)', ylab='value', main='2nd dim')
+    dev.copy(png, filename=paste("C:/gitProject/SpaTempoDA/HW1/prob1_test",test_idx_str,"_oneprocess_traceplot.png", sep = ""))
+    dev.off()
 }
 
-test_suite_for_traceplot = function(mu_2dim, cov_2by2dim, process_num=5, sim_num=100){
+test_suite_for_traceplot = function(mu_2dim, cov_2by2dim, process_num=5, sim_num=100, test_idx_str=""){
     result_x1 = matrix(0, process_num, sim_num)
     result_x2 = matrix(0, process_num, sim_num)
 
@@ -58,6 +66,7 @@ test_suite_for_traceplot = function(mu_2dim, cov_2by2dim, process_num=5, sim_num
             result_x2[i,j] = iter_sample[2]
         }
     }
+    x11()
     par(mfrow=c(2,1))
     grid = seq(0,1,length.out=sim_num)
     plot(grid, result_x1[1,], type='l', xlab='iteration(normalized)', ylab='value', main='1st dim')
@@ -68,6 +77,8 @@ test_suite_for_traceplot = function(mu_2dim, cov_2by2dim, process_num=5, sim_num
     for(i in 2:process_num){
         lines(grid, result_x2[i,])
     }
+    dev.copy(png, filename=paste("C:/gitProject/SpaTempoDA/HW1/prob1_test",test_idx_str,"_many_process_traceplot.png", sep = ""))
+    dev.off()
 }
 
 
@@ -76,12 +87,10 @@ test1_mu = c(1, -1)
 test1_Sigma = matrix(c(1,-1,-1,2),2,2)
 
 
-png(filename="C:/gitProject/SpaTempoDA/HW1/prob1_test1_scatter.png")
-test_suite_for_2d(test1_mu, test1_Sigma)
-dev.off()
-png(filename="C:/gitProject/SpaTempoDA/HW1/prob1_test1_traceplot.png")
-test_suite_for_traceplot(test1_mu, test1_Sigma)
-dev.off()
+# png(filename="C:/gitProject/SpaTempoDA/HW1/prob1_test1_scatter.png")
+test_suite_for_2d(test1_mu, test1_Sigma, test_idx_str="1")
+test_suite_for_traceplot(test1_mu, test1_Sigma, test_idx_str="1")
+
 
 # for test 2,3,4, I use 
 # fields$Matern
@@ -98,12 +107,9 @@ test2_Sigma = Matern(test2_distance_mat, test2_matern_param_range, test2_matern_
 # nu = smoothness in lec.note, range=rho?? in lec.note (maybe!)
 print("set covariance matrix of test 2")
 print(test2_Sigma)
-png(filename="C:/gitProject/SpaTempoDA/HW1/prob1_test2_scatter.png")
-test_suite_for_2d(test2_mu, test2_Sigma)
-dev.off()
-png(filename="C:/gitProject/SpaTempoDA/HW1/prob1_test2_traceplot.png")
-test_suite_for_traceplot(test2_mu, test2_Sigma)
-dev.off()
+test_suite_for_2d(test2_mu, test2_Sigma, test_idx_str="2")
+test_suite_for_traceplot(test2_mu, test2_Sigma, test_idx_str="2")
+
 
 
 # test 3 : with Matern covariance (small nu)
@@ -114,12 +120,9 @@ test3_distance_mat = matrix(c(0,0.2,0.2,0),2,2)
 test3_Sigma = Matern(test3_distance_mat, test3_matern_param_range, test3_matern_param_nu)
 print("set covariance matrix of test 3")
 print(test3_Sigma)
-png(filename="C:/gitProject/SpaTempoDA/HW1/prob1_test3_scatter.png")
-test_suite_for_2d(test3_mu, test3_Sigma)
-dev.off()
-png(filename="C:/gitProject/SpaTempoDA/HW1/prob1_test3_traceplot.png")
-test_suite_for_traceplot(test3_mu, test3_Sigma)
-dev.off()
+test_suite_for_2d(test3_mu, test3_Sigma, test_idx_str="3")
+test_suite_for_traceplot(test3_mu, test3_Sigma, test_idx_str="3")
+
 
 # test 4 : with Matern covariance (big nu)
 test4_mu = c(1, -1)
@@ -129,9 +132,6 @@ test4_distance_mat = matrix(c(0,0.2,0.2,0),2,2)
 test4_Sigma = Matern(test4_distance_mat, test4_matern_param_range, test4_matern_param_nu)
 print("set covariance matrix of test 4")
 print(test4_Sigma)
-png(filename="C:/gitProject/SpaTempoDA/HW1/prob1_test4_scatter.png")
-test_suite_for_2d(test4_mu, test4_Sigma)
-dev.off()
-png(filename="C:/gitProject/SpaTempoDA/HW1/prob1_test4_traceplot.png")
-test_suite_for_traceplot(test4_mu, test4_Sigma)
-dev.off()
+test_suite_for_2d(test4_mu, test4_Sigma, test_idx_str="4")
+test_suite_for_traceplot(test4_mu, test4_Sigma, test_idx_str="4")
+
