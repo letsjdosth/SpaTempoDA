@@ -110,17 +110,22 @@ These differences will be easier to see if you keep the same Z sample but just c
 }
 
 For convenience, I use fields\$Matern function to calculate covariance matrix from parameters of Matern.
+Here are 3 test cases. (In full code, there are one more case for ordinary(not Matern) GP.)
+\begin{itemize}
+    \item $\nu = 0.1$ (in code, test 3)
+    \item $\nu = 0.5$ (in code, test 2)
+    \item $\nu = 1$ (in code, test 4)
+\end{itemize}
+Note that $\nu = 0.5$ case is the exponential covariance.
 
-test2: $\nu = 0.5$
-test3: $\nu = 0.1$
-test4: $\nu = 1$
 
 
-% \begin{figure}[hh]
-%     \centering
-%     \includegraphics[height=8cm]{1982Jyield_raw_bspline4_bspline6.png}
-%     \caption{January 1982 yield: \\ gray: raw data \\ black : fitted curve using 4 b-splines \\ red : fitted curve using 6 b-splines.}
-% \end{figure}
+\begin{figure}[hh]
+    \centering
+    \includegraphics[height=8cm]{prob1_test3_scatter.png}
+    \includegraphics[height=8cm]{prob1_test3_traceplot.png}
+    \caption{$\nu=0.1$}
+\end{figure}
 
 
 
