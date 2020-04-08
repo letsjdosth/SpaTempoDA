@@ -97,4 +97,3 @@ test4_Sigma = Matern(test4_distance_mat, test4_matern_param_range, test4_matern_
 print("set covariance matrix of test 4")
 print(test4_Sigma)
 test_suite_for_2d(test4_mu, test4_Sigma)
-
