@@ -57,7 +57,14 @@ title(main = "Average Annual Temperatures, 1961-1990, Degrees F")
 dev.copy(png,filename="C:/gitProject/SpaTempoDA/HW1/prob2_CAtemp_avgtemp.png")
 dev.off()
 
-
+# quantile(CAtemp$elevation)
+breaks = seq(-56,1500, length.out=100) #<-see range and set by your hand!
+x11()
+ploteqc(CAtemp, CAtemp$elevation, breaks, pch = 19)
+map("county", region = "california", add = TRUE)
+title(main = "elevation")
+dev.copy(png,filename="C:/gitProject/SpaTempoDA/HW1/prob2_CAtemp_elevation.png")
+dev.off()
 
 ## (a) Using the CAtemp data, form a preliminary estimate of β using ordinary least squares and make a color plot of the residuals. 
 # Include your estimates and plot.
