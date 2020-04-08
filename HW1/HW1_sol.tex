@@ -196,7 +196,8 @@ Before solving the problems, Let's see the data. Here is average temperature plo
 \begin{figure}[!h]
     \centering
     \includegraphics[height=8cm]{prob2_CAtemp_avgtemp.png}
-    \caption{average temperature data in CAtemp}
+    \includegraphics[height=8cm]{prob2_CAtemp_elevation.png}
+    \caption{left: average temperature data in CAtemp, right: elevation data in CAtemp}
 \end{figure}
 We can find that data points are relatively sparse at upper-right, middle-right and lower-right region.
 
@@ -446,10 +447,11 @@ The result plots of predicted temperature values and MSE values for each locatio
 For convenience, I attach original data plot one more time.
 
 \begin{figure}[!h]
-    \includegraphics[height=8cm]{prob2_CAtemp_avgtemp.png} \\
+    \includegraphics[height=8cm]{prob2_CAtemp_avgtemp.png} 
+    \includegraphics[height=8cm]{prob2_CAtemp_elevation.png} \\
     \includegraphics[height=8cm]{prob2_CAgrid_predicted_mean.png}
     \includegraphics[height=8cm]{prob2_CAgrid_predicted_MSE.png}
-    \caption{the temperatures of original data(up), 
+    \caption{the temperatures of original data(up-left), the elevations of original data(up-right),
     \\ the predicted temperatures by krigging(down-left), and MSEs by krigging(down-right)}
 \end{figure}
 
