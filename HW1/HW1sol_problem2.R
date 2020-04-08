@@ -3,13 +3,10 @@
 # windows 10 64-bit.
 # R 3.5.2
 
-<<<<<<< HEAD
 # vscode run as source : ctrl+shift+s
 # vscode run selected block only : ctrl+enter
 
-=======
 # Note: many parts of this code is reconstructed from Park's code.
->>>>>>> f09d3ee6ef8d9d0f72f4f62d859179edf53febd3
 
 # 2. The file CAtemps.RData contains two R objects of class SpatialPointsDataFrame, called CAtemp and CAgrid. 
 # CAtemp contains average temperatures from 1961-1990 at 200 locations (latitude and longitude) in California in degrees Fahrenheit, 
