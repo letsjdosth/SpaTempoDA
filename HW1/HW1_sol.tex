@@ -110,7 +110,7 @@ These differences will be easier to see if you keep the same Z sample but just c
 
 For convenience, I use fields\$Matern function to calculate covariance matrix from parameters of Matern.
 And for easy visualization, I will make only 2 dimensional chain.
-Here are 3 test cases. (In full code, there is one more case for ordinary(not Matern) GP.)
+Here are 3 test cases. (In full code, there is one more case for ordinary(not Matern) GP, but you may ignore it.)
 
 Fix $\rho$ to 1. And,
 \begin{itemize}
@@ -133,8 +133,9 @@ Fix $\rho$ to 1. And,
     \end{bmatrix}
     \]
 \end{itemize}
+By changing $\nu$, the calculated covariance matrices are affected,
 
-I generate 5 (different) chains at each $\nu$s.
+Firstly, I generate 5 (different) chains at each $\nu$. Below are the constructed traceplots of them.
 \begin{figure}[!h]
     \centering
     \includegraphics[height=5cm]{prob1_test3_many_process_traceplot.png}
@@ -145,7 +146,7 @@ I generate 5 (different) chains at each $\nu$s.
 
 
 \clearpage
-Nextly, I generate one chain longer, and get scatter-plot and trace-plot.
+To view more detail, I generate one chain longer for each $\nu$, and construct scatterplot and traceplot.
 \begin{figure}[!h]
     \centering
     \includegraphics[height=6cm]{prob1_test3_oneprocess_scatter.png}
@@ -165,8 +166,9 @@ Nextly, I generate one chain longer, and get scatter-plot and trace-plot.
     \caption{$\nu=1$}
 \end{figure}
 
-By changing $\nu$, the calculated covariance matrices are affected,
-and the effects are confirmed by the scatter-plot and trace-plot.
+
+The effect of changing $\nu$ are lucidly confirmed by the scatter-plot.
+The shapes of scatterplots consist with the calculated covariance matrix above.
 
 
 \newpage
@@ -192,14 +194,19 @@ and the $\epsilon$ are iid $N(0,\tau^2)$, independent of Z.
 This is important because we want to predict \(\mu(s_i;\beta)+Z(s_i;\sigma^2,\rho)\) without the measurement error.
 }
 
-Before solving the problems, Let's see the data. Here is average temperature plot of CAtemp.
+
+Before solving the main problems, Let's see the data first. Here is average temperature plot of CAtemp.
 \begin{figure}[!h]
     \centering
     \includegraphics[height=8cm]{prob2_CAtemp_avgtemp.png}
     \includegraphics[height=8cm]{prob2_CAtemp_elevation.png}
     \caption{left: average temperature data in CAtemp, right: elevation data in CAtemp}
 \end{figure}
-We can find that data points are relatively sparse at upper-right, middle-right and lower-right region.
+
+We can observe that data points are relatively sparse at upper-right, middle-right and lower-right region.
+It may make some problems when we predict the temperature around these region.
+And, we can also find something like cluster in the temperature data.
+Maybe it need a model concerning with spatial covariance structure to analyze these data.
 
 
 \clearpage
@@ -209,8 +216,9 @@ Using the CAtemp data, form a preliminary estimate of $\beta$ using ordinary lea
 and make a color plot of the residuals.
 Include your estimates and plot.
 }
+
 It is easy work if we use built-in lm function of R.
-Load the CAtemps.Rdata and run this code to get what we want.
+Load the CAtemps.Rdata and run this code block to get what we want.
 \begin{Rcode}
     \begin{verbatim}
 ols = lm(avgtemp~lon+lat+elevation, data=CAtemp)
@@ -224,17 +232,21 @@ The results of the ordinary least squares' coefficients calculated by R are
 \[\hat{\beta}_{2:OLS}=0.5646805\]
 \[\hat{\beta}_{3:OLS}=-0.009648649\]
 where \(\mu(s_i;\beta)=\beta_0+\beta_1 Longitude(s) + \beta_2 Latitude(s)+\beta_3 Elevation(s)\).
+Be careful to interpret these values. 
+They are problematic because they draw from the model without considering a covariance structure.
+So, we have better to deal with them only for getting residuals as a step for given spatial model in the problem.
 
-And, the residual at each data point is plotted.
+
+Nextly, the residual at each data point is plotted.
 \begin{figure}[!h]
     \centering
     \includegraphics[height=8cm]{prob2_CAtemp_ols_residual.png}
     \caption{the residuals of OLS}
 \end{figure}
 
-Be careful, 0 is colored by light-green.
+More once, be careful. 0 is colored by light-green.
 
-We can find that there are some patterns in residuals. So we have to doubt to exist some dependencies in this data.
+We can observe that there are some patterns in residuals. So we have to doubt more that there exists some dependencies.
 
 
 \clearpage
@@ -245,7 +257,7 @@ Make and include a plot of the nonparametric and parametric variogram functions.
 Also store your parameter estimates and report them.
 }
 
-For variogram, I use the 'variogram' function of gstat package in R. Then, the code become (magically) simple.
+For variogram, I use the 'gstat\$variogram' function. Then, the code become (magically) simple.
 Here is the key code to get non-parametric variogram. I choose the width to 50.
 
 \begin{Rcode}
@@ -257,10 +269,9 @@ vgangle = variogram(ols.residual ~ 1, data = CAtemp, alpha = c(0, 45, 90, 135))
 print(plot(vgangle, xlab = "Distance", ylab = "Semi-variogram estimate"))
     \end{verbatim}
 \end{Rcode}
-(The print function call is needed to save the plot when I run this code in the console, not in the interactive interpreter.
-So, you may ignore it.)
 
-The plots are here. 
+
+The variogram plots are here. 
 \begin{figure}[!h]
     \centering
     \includegraphics[height=8cm]{prob2_CAtemp_variogram.png}
@@ -268,23 +279,21 @@ The plots are here.
     \caption{nonparametric variogram fit}
 \end{figure}
 
-The brief shape of variogram is not a flat line, so the doubt above is proper as we see here, too.
-And, since the shapes of the rotated variograms also have same shapes, the result doesn't have a big problem.
+The brief shape of variogram is not a flat line, so our doubt above is proper as we see here.
+And, since the shapes of the rotated variograms have quite similar shapes, this variogram doesn't have a big problem.
 
-Next, I will fit the variogram to exponential variogram model.
-Again, the gstat package in R make our problem very simple. I will use 'fit.variogram' function in the package.
+Next, I will fit the variogram to exponential variogram model following the direction of the problem.
+In this time, the 'gstat\$fit.variogram' funciton make our problem very simple.
 
 \begin{Rcode}
     \begin{verbatim}
+# fit
 fitvg = fit.variogram(vg, vgm(1, "Exp", range=300, nugget=3)) 
 
 # estimated parameters of variance term
 s2.hat = fitvg$psill[2]
 rho.hat = fitvg$range[2]
 tau2.hat = fitvg$psill[1]
-
-# plot
-print(plot(vg, fitvg, xlab = "Distance", ylab = "Semi-variogram estimate"))
     \end{verbatim}
 \end{Rcode}
 
@@ -297,10 +306,19 @@ Below is the result plot.
     \caption{the variogram fitted to the exponential model}
 \end{figure}
 
-And, the estimated parameter values of covariance's using the least square method are,
+And, the estimated parameter values of exponential covariance function
+calculated by using the least square method are,
+(or, using the result of lecture note 1, 48 page's, \(\gamma(h)=C(0)-C(h)=\tau^2+\sigma^2(1-exp(-||h||/\rho))\)),
+
 \[\hat{\sigma}^2 = 4.635655\]
 \[\hat{\rho} = 115.7653\]
 \[\hat{\tau}^2 = 2.434879\]
+
+So our covariance function becomes, when $i\neq j$
+\[C(s_i,s_j)=\sigma^2 exp(-||s_i-s_j||\rho) = 4.635655^2 exp(-115.7653||s_i-s_j||)\]
+or when $i=j$,
+\[C(s_i,s_j)=\sigma^2 + \tau^2 = 4.635655^2 + 2.434879^2\]
+
 
 \clearpage
 \subsection{Problem 2-(c)}
@@ -315,10 +333,18 @@ We will now form the GLS estimate of $\beta$ by hand, rather than using the gls 
 \end{itemize}
 }
 
-I implement the code of GLS by hand. 
+I implement the procedure GLS by hand. 
 
-To get miles-distance matrix from (lat,lon) data, I use the chordal distance.
-And, following the direction of problem, I use exponential covariance function to make the covariance matrix.
+
+Because given data just include the (lat,lon) information, 
+I convert from them to miles-measure distance by using the chordal distance.
+Then, to get distance matrix, I wse 'rdist' function.
+And using it with result of (b)-the estimated covariace function- I make the covariance matrix.
+Then, I will invert it and do gls estimation procedure.
+
+Here are the code blocks.
+
+
 \begin{Rcode}
     \begin{verbatim}
 make_chordaldist_u1u2_for_rdist = function(lat, lon){
@@ -363,7 +389,8 @@ b0 = rep(1,200)
 gls.X = as.matrix(data.frame(b0, CAtemp$lon, CAtemp$lat, CAtemp$elevation))
 gls.Y = as.matrix(CAtemp$avgtemp)
 CAtemp_data_inv_cov_mat = solve(CAtemp_data_cov_mat)
-gls.beta = solve(t(gls.X) %*% CAtemp_data_inv_cov_mat %*% gls.X) %*% t(gls.X) %*% CAtemp_data_inv_cov_mat %*% gls.Y
+gls.beta = solve(t(gls.X) %*% CAtemp_data_inv_cov_mat %*% gls.X) %*% 
+    t(gls.X) %*% CAtemp_data_inv_cov_mat %*% gls.Y
 print("gls coefficients")
 cat('(Intercept)    lon       lat    elevation\n',gls.beta,'\n')
 print('----------------')
@@ -378,6 +405,10 @@ The results of the GLS' coefficients calculated by R are
 where \(\mu(s_i;\beta)=\beta_0+\beta_1 Longitude(s) + \beta_2 Latitude(s)+\beta_3 Elevation(s)\).
 
 They are not differ drastically, but maybe OLS model affects more to the standard error of the estimates comparing to OLS model.
+And now, since we considered the covariance structure of data,
+we can try to interpret the coefficient properly. 
+For example, if the elevation increase by a meter, then the temperature decrease about 0.0096 F.
+We can do similar interpretation for other coefficients, too.
 
 
 \clearpage
@@ -388,10 +419,12 @@ plugging in your estimates from (b) and (c).
 Calculate and plot the (estimated) standard error of $Z$ at each prediction location
 }
 
-I calculate MSE rather than standard error, because their roles simillar,
-but it shows more interesting things than estimated standard error in this case.
+Although the direction of the problem asks for the standard error, 
+I will calculate and give the MSE rather than the standard error,
+because it shows more interesting things than estimated standard error in this case,
+and moreover their roles are similar.
 
-I will re-use the calculated value and R-functions to get EBLUP and MSE.
+I will re-use the calculated values and my R-functions to get EBLUP and MSE.
 Key parts of the code are here.
 
 
@@ -444,7 +477,8 @@ CAgrid$pred.mse.temp = pred_mse
 
 \clearpage
 The result plots of predicted temperature values and MSE values for each location in CAgrid are here.
-For convenience, I attach original data plot one more time.
+For convenience of comparison and evaluation, I re-attach original data plots here one more time.
+Upper 2 plots are given data, and lower 2 plots are predicted ones from just above works.
 
 \begin{figure}[!h]
     \includegraphics[height=8cm]{prob2_CAtemp_avgtemp.png} 
@@ -455,9 +489,10 @@ For convenience, I attach original data plot one more time.
     \\ the predicted temperatures by krigging(down-left), and MSEs by krigging(down-right)}
 \end{figure}
 
-We can find that the krigging is quite well enough to explain the original temperature values
-around the original data point's values. 
-And, I should emphasize that the region of sparse data points has relatively higher MSE
+We can find that the krigging is quite well enough to predict similar values to original data
+at the close krigging points.
+And we observe that the elevations matter to the temperature consisting with our common knowledge.
+Finally, I should emphasize that the region of sparse data points has relatively higher MSE
 than the region of dense data points. It is reasonable.
 
 \end{document}
