@@ -207,7 +207,7 @@ tie_plot(beta.final[1,], "beta0")
 tie_plot(beta.final[2,], "beta1")
 tie_plot(beta.final[3,], "beta2")
 tie_plot(beta.final[4,], "beta3")
-tie_plot(eta.obs.final[1,],"eta(first dim)")
+tie_plot(eta.obs.final[1,],"eta(first_dim)")
 tie_plot(rho.final,"rho")
 
 
@@ -246,7 +246,7 @@ breaks <- seq(30, 80, by = 5)
 ploteqc(CAgrid, eta.pred.m, breaks, pch = 19)
 map("county", region = "california", add = TRUE)
 title(main = "Posterior Mean")
-dev.copy(png,filename="C:/gitProject/SpaTempoDA/HW2/prob2_poseterior.png")
+dev.copy(png,filename="C:/gitProject/SpaTempoDA/HW2/prob2_posterior.png")
 dev.off()
 
 
@@ -257,6 +257,6 @@ ploteqc(CAgrid, eta.pred.sd, breaks, pch = 19)
 map("county", region = "california", add = TRUE)
 points(CAtemp)
 title(main = "Posterior Standard Deviation")
-dev.copy(png,filename="C:/gitProject/SpaTempoDA/HW2/prob2_poseterior_SE.png")
+dev.copy(png,filename="C:/gitProject/SpaTempoDA/HW2/prob2_posterior_SE.png")
 dev.off()
 
