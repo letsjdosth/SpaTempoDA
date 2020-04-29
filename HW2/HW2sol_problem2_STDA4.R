@@ -190,17 +190,22 @@ effectiveSize(rho.final)
 
 
 tie_plot = function(final, param_name){
-  dev.new(width=15, height=7.5, unit="cm")
-  par(mfrow=c(1,2), pty="s")
+  dev.new()
   plot(final, type="l")
   title(paste("trace plot of", param_name, sep=" "))
+  file_name = paste("C:/gitProject/SpaTempoDA/HW2/prob2_",param_name,"_traceplot.png",sep="")
+  dev.copy(png,filename=file_name)
+  dev.off()
+  
+  dev.new()
   acf(final, main="acf")
   text(30,0.9,labels=paste("ESS:", effectiveSize(final)),pos=2)
   
-  file_name = paste("C:/gitProject/SpaTempoDA/HW2/prob2_",param_name,".png",sep="")
+  file_name = paste("C:/gitProject/SpaTempoDA/HW2/prob2_",param_name,"_acf.png",sep="")
   dev.copy(png,filename=file_name)
   dev.off()
 }
+
 tie_plot(s2.final, "sigma_square")
 tie_plot(t2.final, "tau_square")
 tie_plot(beta.final[1,], "beta0")
