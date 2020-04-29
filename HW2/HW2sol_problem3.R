@@ -145,7 +145,7 @@ summaryFunction<-function(mcmcDat){
 plotFunction = function(mcmcDat, trueParamVal, paramName){
   dev.new(width=15, height=7.5, unit="cm")
 
-  par(mfrow=c(1,2))
+  par(mfrow=c(1,3))
   MCsample_mean = mean(mcmcDat)
   MCsample_hpd = hpd(mcmcDat)
 
@@ -164,6 +164,8 @@ plotFunction = function(mcmcDat, trueParamVal, paramName){
   text(MCsample_mean,0.001,label="MCMC",col="blue",pos=3)
   lines(MCsample_hpd,c(0.001,0.001), col="blue",lwd=3)
   text(MCsample_hpd[1],0.001,label="95%HPD",col="blue",pos=3)
+
+  acf(mcmcDat, main="acf")
 
   plot_filename=paste("C:/gitProject/SpaTempoDA/HW2/prob3_",paramName,".png",sep="")
   dev.copy(png,filename=plot_filename)
