@@ -73,9 +73,9 @@ It may, however, not be complicate to optimize the likelihood analytically so th
 The result are summarized by below plot which illustrates the likelihood with respect to $\rho$ on the range $[0.005, 0.5]$
 and its critical point.
 
-\begin{figure}[!h]
+\begin{figure}[hh]
     \centering
-    \includegraphics[height=6cm]{prob1_rho_profile_log_likelihood.png}
+    \includegraphics[height=7cm]{prob1_rho_profile_log_likelihood.png}
     \caption{the profile log-likelihood of $\rho$}
 \end{figure}
 
@@ -107,8 +107,8 @@ For beginning, we should get a joint posterior of the parameters.
 (For convenience, I deal with $\tau^2$ instead of $\tau$, and drop the 'obs' subscript of $\eta$.)
 
 By Bayes theorem, the pdf of the joint posterior becomes
-\[f(\eta,\sigma^2,\tau^2,\rho^2)\]
-\[\propto f(Y|\eta,\sigma^2,\tau^2,\rho)f(\eta|\sigma^2,\tau^2,\rho)f(\sigma^2)f(\tau^2)f(\rho)\]
+\[f(\eta,\sigma^2,\tau^2,\rho^2)
+    \propto f(Y|\eta,\sigma^2,\tau^2,\rho)f(\eta|\sigma^2,\tau^2,\rho)f(\sigma^2)f(\tau^2)f(\rho)\]
 \[\propto N(\eta,\tau^2I) * GP(X'\beta, \sigma^2 K(\rho))
     * N(m_\beta,v_\beta) * InvGamma(a_\sigma^2, b_\sigma^2) * InvGamma(a_\tau^2, b_\tau^2)
     * Gamma(a_\rho, b_\rho) \]
@@ -130,7 +130,10 @@ and mean which is by weighted average of original two means using precision as w
 \[e^{-\frac{(X-m_1)^2}{2v_1^2}} * e^{-\frac{(X-m2)^2}{2v_2^2}}
     \propto e^{-\frac{(X-(\frac{m_1}{v_1^2} + \frac{m_2}{v_2^2})/(\frac{1}{v_1^2} + \frac{1}{v_2^2}))^2}{2(\frac{1}{v_1^2}+\frac{1}{v_2^2})}}\]
 
-Then, we get
+\clearpage
+(\textbf{NOTE}: At below, I use the expression like $\frac{1}{A}$ for a matrix $A$,
+strictly speaking, although it is not correct. Precisely, I have to use $A^{-1}$ instead of $\frac{1}{A}$.
+However, I keep using the fractional notation, for intuition and showing how two means and variances are mixed together more directly.)
 
 for $\eta$,
 \[f(\eta|\beta,\sigma^2,\tau^2,\rho,Y) \propto e^{-\frac{(\eta - (\frac{y}{\tau^2} + \frac{X'\beta}{\sigma^2 K(\rho)}) / (\frac{1}{\tau^2}+\frac{1}{\sigma^2 K(\rho)}))^2}{2(\frac{1}{\tau^2}+\frac{1}{\sigma^2 K(\rho)})}}
@@ -155,57 +158,68 @@ for $\tau^2$,
 
 Since we have conditional distributions of parameters except $\rho$,
 we are ready to generate samples of the joint posterior using Metropolis-Gibbs sampler.
-Sudo code is here.
+Pseudo code is here.
 \begin{mdframed}
     \begin{small}
         \begin{verbatim}
-Y = data
-(eta[0], beta[0], sigma_sq[0], tau_sq[0], rho[0]) = initial_values
+Y = data; (eta[0], beta[0], sigma_sq[0], tau_sq[0], rho[0]) = initial_values
 for i in 1:sample_num:
-    new_eta = random_sample_from_eta's_conditional_posterior(beta[i-1], sigma_sq[i-1], tau_sq[i-1], rho[i-1], Y)
-    new_beta = random_sample_from_beta's_conditional_posterior(new_eta, sigma_sq[i-1], tau_sq[i-1], rho[i-1], Y)
-    new_sigma_sq = random_sample_from_sigma_sq's_conditional_posterior(new_eta, new_beta, tau_sq[i-1], rho[i-1], Y)
-    new_tau_sq = random_sample_from_tau_sq's_conditional_posterior(new_eta, new_beta, new_sigma_sq, rho[i-1], Y)
+    new_eta = random_sample_from_eta's_conditional_posterior(
+        beta[i-1], sigma_sq[i-1], tau_sq[i-1], rho[i-1], Y)
+    new_beta = random_sample_from_beta's_conditional_posterior(
+        new_eta, sigma_sq[i-1], tau_sq[i-1], rho[i-1], Y)
+    new_sigma_sq = random_sample_from_sigma_sq's_conditional_posterior(
+        new_eta, new_beta, tau_sq[i-1], rho[i-1], Y)
+    new_tau_sq = random_sample_from_tau_sq's_conditional_posterior(
+        new_eta, new_beta, new_sigma_sq, rho[i-1], Y)
     (eta[i],beta[i],sigma_sq[i],tau_sq[i]) = new_eta, new_beta, new_sigma_sq, new_tau_sq
 
     proposed_rho = proposal_distribution_of_rho(rho[i-1])
-    MH_ratio = non_normalized_joint_posterior(proposed_rho)*proposal_pdf(rho[i-1] | proposed_rho) / 
-        (non_normalized_joint_posterior(rho[i-1])*proposal_pdf(proposed_rho | rho[i-1]))
-    unif_random = random_sample_from_uniform(0,1)
-    if MH_ratio > unif_random:
+    #(comment: commonly, this part is implemented by log version, worrying for underflow.)
+    MH_ratio = unnormalized_joint_posterior(proposed_rho)*proposal_pdf(rho[i-1]|proposed_rho)/
+        (unnormalized_joint_posterior(rho[i-1])*proposal_pdf(proposed_rho|rho[i-1]))
+    unif_random_sample = random_sample_from_uniform(0,1)
+    if MH_ratio > unif_random_sample:
         rho[i] = proposed_rho
     else:
         rho[i] = rho[i-1]
-
 Do:
-    diagnostics (get traceplot, acf plot, acc-rate of rho, ESS and so on.)
+    diagnostics (get summary statistic, traceplot, acf plot, acc-rate of rho, ESS and so on.)
     If needed, cut burn-in period and do thinning.
         \end{verbatim}
     \end{small}
 \end{mdframed}
 
+\clearpage
 Just running the given "STDA4.R", we can replicate the posterior samples of our model.
 Here are the diagnostic plots.
 
-\clearpage
 \begin{figure}[!h]
     \centering
-    \includegraphics[height=5cm]{prob2_beta0.png}
-    \includegraphics[height=5cm]{prob2_beta1.png} \\
-    \includegraphics[height=5cm]{prob2_beta2.png}
-    \includegraphics[height=5cm]{prob2_beta3.png} \\
-    \includegraphics[height=5cm]{prob2_eta(first_dim).png}
-    \includegraphics[height=5cm]{prob2_sigma_square.png} \\
-    \includegraphics[height=5cm]{prob2_tau_square.png}
-    \includegraphics[height=5cm]{prob2_rho.png}
+    \includegraphics[width=4cm]{prob2_beta0_traceplot.png}
+    \includegraphics[width=4cm]{prob2_beta0_acf.png}
+    \includegraphics[width=4cm]{prob2_beta1_traceplot.png}
+    \includegraphics[width=4cm]{prob2_beta1_acf.png} \\
+    \includegraphics[width=4cm]{prob2_beta2_traceplot.png}
+    \includegraphics[width=4cm]{prob2_beta2_acf.png}
+    \includegraphics[width=4cm]{prob2_beta3_traceplot.png}
+    \includegraphics[width=4cm]{prob2_beta3_acf.png}\\
+    \includegraphics[width=4cm]{prob2_eta(first_dim)_traceplot.png}
+    \includegraphics[width=4cm]{prob2_eta(first_dim)_acf.png}
+    \includegraphics[width=4cm]{prob2_sigma_square_traceplot.png}
+    \includegraphics[width=4cm]{prob2_sigma_square_acf.png}\\
+    \includegraphics[width=4cm]{prob2_tau_square_traceplot.png}
+    \includegraphics[width=4cm]{prob2_tau_square_acf.png}
+    \includegraphics[width=4cm]{prob2_rho_traceplot.png}
+    \includegraphics[width=4cm]{prob2_rho_acf.png}
     \caption{For each parameter, left:trace-plot and ESS, right:acf plot}
 \end{figure}
-\clearpage
 
 It seems that the variance-related parameters are not mixed well. 
 For better inference, we had better to run longer, cut burn- in period and do thinning.
 But I stop here and report raw result of Metropolis-Gibbs sampler.
 
+\clearpage
 Finally, here are the prediction and SE plot.
 
 
@@ -224,5 +238,114 @@ And Standard error also fit to the expectation, which is higher in sparse data r
 dense data region.
 Thus we conclude that the algorithm works well.
 
+
+\section{Problem3}
+\textbf{
+Following the model in page 24 of STDA4 slide, 
+implement Nimble-based MCMC code for Binomial data.
+Report result for MCMC samples for $\beta,\sigma^2,\rho$ (posterior mean, tracep lots, highest posterior density.)
+}
+
+I choose n, the binomial parameter, to 1 so that my model reduced to bernoulli or binary data model.
+I generate 400 data points in $[0,1]\times[0,1] \in \mathcal{R}^2\times\mathcal{R}^2$
+following the GP with an exponential covariance structure (for latent variable) and bernoulli (for observable response variable).
+with some parameter values which I choose.
+And using Bayesian approach which uses the (normal \& inverse gamma)-GP-bernoulli hierarchical model and
+MCMC algorithm provided by Nimble, re-fit the parameters.
+
+Here is a part of my R-Nimble code of declaring model and run MCMC.
+I run 200,000 MCMC iterations.
+\begin{Rcode}
+    \begin{verbatim}
+model_string = nimbleCode({
+
+    #Data Model
+    for(i in 1:n){
+        prob[i] <- exp(W[i]+XB[i])/(1+exp(W[i]+XB[i]))
+        Z[i] ~ dbern(prob[i])
+    }
+    #Constant and Cov Matrix
+    XB[1:n] <- beta0*X[,1] + beta1*X[,2] + beta2*X[,3]
+    covMat[1:n,1:n] <- expcov(dists[1:n,1:n],rho)
+    fullCovMat[1:n,1:n] <- sigma2 * covMat[1:n,1:n]
+
+    #Process Model
+    W[1:n] ~ dmnorm(mean=mn[1:n], cov=fullCovMat[1:n,1:n])
+
+    #Parameter Models
+    sigma2 ~ dinvgamma(0.2, 0.2)
+    rho ~ dunif(0,1)
+    beta0 ~ dnorm(0, sd=sqrt(100))
+    beta1 ~ dnorm(0, sd=sqrt(100))
+    beta2 ~ dnorm(0, sd=sqrt(100))
+})
+
+niter = 200000
+consts = list(n=n, X=sim_X, dists=dist_mat, mn=rep(0,n))
+data = list(Z=sim_Y)
+inits = list(beta0 = rnorm(1), beta1=rnorm(1), beta2=rnorm(1), rho=0.5, sigma2=2, W=rnorm(n))
+
+pt = proc.time()
+samples = nimbleMCMC(model_string, data=data, inits=inits, constants=consts,
+    monitors=c("beta1","beta2","rho","sigma2","W"),
+    samplesAsCodaMCMC=TRUE, WAIC=FALSE, summary=FALSE,
+    niter=niter, nburnin=0, nchains=1)
+ptFinal = proc.time()-pt
+    \end{verbatim}
+\end{Rcode}
+In my computer, the elapsed time for running MCMC is 55 min 58 sec.
+
+I cut the first 10000 samples for burn-in, and keep 190000 samples.
+(in fact, I should cut more, but to show the convergence on trace plot, I cut only 10000 samples.)
+
+Below are summary things.
+\begin{verbatim}
+=====================================================
+            beta1     beta2     sigma2     rho
+true value  1         1         0.1        0.1
+=====================================================
+[at the sample index 10000:200000]
+Mean        0.2732620 1.5722295 0.10816691 0.45473722
+95%CI-Low  -0.5939745 0.7286489 0.04099271 0.02713608
+95%CI-High  1.1278836 2.4583612 0.20240903 0.94366208
+[at the whole sample indices]
+Acc.rate    0.4395222 0.4393472 0.42739214 0.46509233
+=====================================================        
+\end{verbatim}
+
+And, here are trace plots, empirical densities (role of histogram) and acf plots of
+each parameter.
+
+\clearpage
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=5cm]{prob3_beta1_traceplot.png} 
+    \includegraphics[width=5cm]{prob3_beta1_density.png} 
+    \includegraphics[width=5cm]{prob3_beta1_acf.png} \\
+    \includegraphics[width=5cm]{prob3_beta2_traceplot.png} 
+    \includegraphics[width=5cm]{prob3_beta2_density.png} 
+    \includegraphics[width=5cm]{prob3_beta2_acf.png} \\
+    \includegraphics[width=5cm]{prob3_sigma2_traceplot.png} 
+    \includegraphics[width=5cm]{prob3_sigma2_density.png} 
+    \includegraphics[width=5cm]{prob3_sigma2_acf.png} \\
+    \includegraphics[width=5cm]{prob3_rho_traceplot.png} 
+    \includegraphics[width=5cm]{prob3_rho_density.png} 
+    \includegraphics[width=5cm]{prob3_rho_acf.png} \\
+    \caption{For each parameter, left:trace-plot, middle:sample empirical density, right:acf plot\\
+    red line: true parameter value, blue line: (thin)sample mean value and (thick)95\% HPD}
+
+\end{figure}
+\clearpage
+
+You may evaluate the results as something problematic when you see 
+high autocorrelation among samples, and traceplot of each parameter, especially of $\rho$.
+
+In general, however, sampling from complex distributions needs very long-iteration and
+very high thinning lag for proper acf. But now, I do just 200,000 iteration and don't do thinning.
+
+And in common, parameters related to variance is quite difficult to converge,
+even in basic normal-normal hierarchical model. And so does our case.
+If I simulate at better situation, (for example, with more data),
+I will make the convergence better and get better traceplots for all parameters.
 
 \end{document}
