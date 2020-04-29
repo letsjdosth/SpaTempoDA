@@ -143,12 +143,11 @@ summaryFunction<-function(mcmcDat){
 }
 
 plotFunction = function(mcmcDat, trueParamVal, paramName){
-  dev.new(width=15, height=7.5, unit="cm")
-
-  par(mfrow=c(1,3))
+  
   MCsample_mean = mean(mcmcDat)
   MCsample_hpd = hpd(mcmcDat)
 
+  dev.new(width=480, height=480, units="px")
   plot.ts(mcmcDat)
   abline(h=trueParamVal, col="red", lwd=2)
   abline(h=MCsample_mean, col="blue", lwd=2)
@@ -156,7 +155,11 @@ plotFunction = function(mcmcDat, trueParamVal, paramName){
   text(0,trueParamVal,label="TRUE", col="red", pos=3)
   text(0,MCsample_mean,label="MCMC", col="blue", pos=3)
 
+  plot_filename=paste("C:/gitProject/SpaTempoDA/HW2/prob3_",paramName,"_traceplot.png",sep="")
+  dev.copy(png, filename=plot_filename)
+  dev.off()
 
+  dev.new(width=480, height=480, units="px")
   plot(density(mcmcDat), main=paste("emp. density of", paramName))
   abline(v=trueParamVal, col="red", lwd=2)
   abline(v=MCsample_mean, col="blue", lwd=2)
@@ -165,10 +168,15 @@ plotFunction = function(mcmcDat, trueParamVal, paramName){
   lines(MCsample_hpd,c(0.001,0.001), col="blue",lwd=3)
   text(MCsample_hpd[1],0.001,label="95%HPD",col="blue",pos=3)
 
+  plot_filename=paste("C:/gitProject/SpaTempoDA/HW2/prob3_",paramName,"_density.png",sep="")
+  dev.copy(png, filename=plot_filename)
+  dev.off()
+
+  dev.new(width=480, height=480, units="px")
   acf(mcmcDat, main="acf")
 
-  plot_filename=paste("C:/gitProject/SpaTempoDA/HW2/prob3_",paramName,".png",sep="")
-  dev.copy(png,filename=plot_filename)
+  plot_filename=paste("C:/gitProject/SpaTempoDA/HW2/prob3_",paramName,"_acf.png",sep="")
+  dev.copy(png, filename=plot_filename)
   dev.off()
 }
 
@@ -177,7 +185,8 @@ plotFunction = function(mcmcDat, trueParamVal, paramName){
 SummaryMat = list()
 SummaryMat[[1]] = summaryFunction(samples[,c("beta1","beta2","sigma2","rho")])
 SummaryMat[[2]] = summaryFunction(samples[,1:n])
-# save(SummaryMat,samples,ptFinal,file="C:/gitProject/SpaTempoDA/HW2/prob2_MCMCresult.RData")
+# save(SummaryMat,samples,ptFinal,file="C:/gitProject/SpaTempoDA/HW2/__prob3_MCMCresult.RData")
+# load("C:/gitProject/SpaTempoDA/HW2/__prob3_MCMCresult.RData")
 print(SummaryMat[[1]])
 
 # beta = c(0, 1, 1); sigma2 = 0.1; rho = 0.1 # true parameters
