@@ -60,18 +60,17 @@ You may use the same simulation settings as in the provided code.
 In the given setting, We want to get the MLE from the log-likelihood function,
 \[l(\beta,\sigma, \rho) \propto -\frac{1}{2} log|\Sigma(\sigma^2,\rho)| - \frac{1}{2}(Y-X\beta)'\Sigma(\sigma^2,\rho)^{-1}(Y-X\beta) \]
 where $\Sigma(\sigma^2,\rho)_{i,j}= \frac{|s_i-s_j|\rho}{\sigma^2}$, the exponential covariance.
-To simplify the optimization problem of the log-likelihood, I do profiling for some parameters,
-$\beta$, and since exponential covariance function has good form to profile $\sigma^2$,
-also for $\sigma^2$.
+To simplify the optimization problem of the log-likelihood, I do profiling $\beta$ and $\sigma^2$,
+since exponential covariance function has easy form to profile $\sigma^2$.
 
-First of all, fix $\rho$ and calculate MLE for $\beta, \sigma^2$ analytically under the fixed $\rho$.
+First of all, fix $\rho$ and calculate MLE for $\beta, \sigma^2$ analytically under the $\rho$.
 Then, we get
 \[\hat{\beta}(\rho) = (X'\Sigma(\rho)^{-1}X)^{-1}X'\Sigma(\rho)^{-1}Y\]
 \[\hat{\sigma}^2(\rho) = \frac{1}{n} (Y-X\hat{\beta}(\rho))'\Sigma(\rho)^{-1}(Y-X\hat{\beta}(\rho))\]
 Plug them to the original log-likelihood function. Then we get the profile log-likelihood which depend only on $\rho$.
 It may, however, not be complicate to optimize the likelihood analytically so that I optimize it numerically.
-The result are summarized by below plot which illustrates the likelihood with respect to $\rho$ on the range $[0.005, 0.5]$
-and its critical point.
+The result is summarized by below plot which illustrates the profile likelihood function with respect to $\rho$ 
+on the range $[0.005, 0.5]$ and its critical point.
 
 \begin{figure}[hh]
     \centering
@@ -79,14 +78,17 @@ and its critical point.
     \caption{the profile log-likelihood of $\rho$}
 \end{figure}
 
-The value at maximum is about $0.09216$. so
+The value $\rho$ which maximize the likelihood is about
 \[\hat{\rho}_{P-MLE} = 0.09216\]
 
-Next, using this $\rho_{P-MLE}$, calculate $\hat{\beta}(\rho_{P-MLE})$ and $\hat{\sigma}^2(\rho_{P-MLE})$.
+Next, using this $\rho_{P-MLE}$, calculate $\hat{\beta}(\hat{\rho}_{P-MLE})$ and $\hat{\sigma}^2(\hat{\rho}_{P-MLE})$.
 Then, we get
 % write the values!
-\[\hat{\beta}_{P-MLE} = 0\] 
-\[\hat{\sigma}^2_{P-MLE} = 0\]
+\[\hat{\beta}_{P-MLE} = 
+\begin{bmatrix}
+    -0.03921947 & 1.21942596 & 0.94645748
+\end{bmatrix} \]
+\[\hat{\sigma}^2_{P-MLE} = 0.09971098\]
 These are what we want.
 
 
@@ -101,10 +103,10 @@ Following the model in page 7 of STDA4 slide, based on the provided code, do bel
         (2) Provide prediction maps (both predictive posterior mean and standard deviation).
 \end{itemize}
 }
+For my convenience, I deal with $\tau^2$ instead of $\tau$, and drop the 'obs' subscript of $\eta_{obs}$.
 
 Let's get conditional distributions for $\beta, \tau^2, \sigma^2, \eta_{obs}$.
 For beginning, we should get a joint posterior of the parameters.
-(For convenience, I deal with $\tau^2$ instead of $\tau$, and drop the 'obs' subscript of $\eta$.)
 
 By Bayes theorem, the pdf of the joint posterior becomes
 \[f(\eta,\sigma^2,\tau^2,\rho^2)
@@ -121,18 +123,18 @@ By Bayes theorem, the pdf of the joint posterior becomes
     \]
 where $K(\rho)=K(.,.,\rho)$ is exponential term of exponential covariance.
 
-To get conditional distribution of each parameter, we just read terms of the joint distribution
+To get conditional distribution of each parameter, I just read terms of the joint distribution
 including the wanted parameter. 
 
-And note that, after mixing two gaussian kernel with respect to a parameter,
-we get another normal kernel, with variance which is by inverting original two variances (or simply, 'precisions') and adding them together,
-and mean which is by weighted average of original two means using precision as weights. Or,
+Note that, after mixing two gaussian kernel with respect to a parameter,
+we get another gaussian kernel, with variance which is by inverting original two variances (or simply say, 'precisions') and adding them together,
+and mean which is by weighted average of original two means using precisions as weights. Or,
 \[e^{-\frac{(X-m_1)^2}{2v_1^2}} * e^{-\frac{(X-m2)^2}{2v_2^2}}
     \propto e^{-\frac{(X-(\frac{m_1}{v_1^2} + \frac{m_2}{v_2^2})/(\frac{1}{v_1^2} + \frac{1}{v_2^2}))^2}{2(\frac{1}{v_1^2}+\frac{1}{v_2^2})}}\]
 
 \clearpage
-(\textbf{NOTE}: At below, I use the expression like $\frac{1}{A}$ for a matrix $A$,
-strictly speaking, although it is not correct. Precisely, I have to use $A^{-1}$ instead of $\frac{1}{A}$.
+(\textbf{NOTE}: At below, I use the expression like $\frac{1}{A}$ for a matrix $A$, although it is not correct. 
+Precisely, I have to use $A^{-1}$ instead of $\frac{1}{A}$.
 However, I keep using the fractional notation, for intuition and showing how two means and variances are mixed together more directly.)
 
 for $\eta$,
@@ -216,7 +218,7 @@ Here are the diagnostic plots.
 \end{figure}
 
 It seems that the variance-related parameters are not mixed well. 
-For better inference, we had better to run longer, cut burn- in period and do thinning.
+For better inference, we had better to run longer, cut burn-in period and do thinning.
 But I stop here and report raw result of Metropolis-Gibbs sampler.
 
 \clearpage
@@ -230,11 +232,11 @@ Finally, here are the prediction and SE plot.
     \caption{left: prediction mean of temperature, right: standard error}
 \end{figure}
 
-Comparing these results with those of HW1, temperature values predicted by each models
-are different but quite similar, and both are reasonable because the results are matched 
+Comparing these results with those of HW1, temperature values predicted by each model
+are slightly different but quite similar, and both are reasonable because the results are matched 
 our common sense that the temperature are inversely related to elevation, 
-and higher as go south-east in CA region.
-And Standard error also fit to the expectation, which is higher in sparse data region than
+and directly related as going to south-east in CA region.
+And Standard errors also fit to the expectation, which are higher in sparse data region than
 dense data region.
 Thus we conclude that the algorithm works well.
 
@@ -243,18 +245,18 @@ Thus we conclude that the algorithm works well.
 \textbf{
 Following the model in page 24 of STDA4 slide, 
 implement Nimble-based MCMC code for Binomial data.
-Report result for MCMC samples for $\beta,\sigma^2,\rho$ (posterior mean, tracep lots, highest posterior density.)
+Report result for MCMC samples for $\beta,\sigma^2,\rho$ (posterior mean, traceplots, highest posterior density.)
 }
 
-I choose n, the binomial parameter, to 1 so that my model reduced to bernoulli or binary data model.
+I choose n, the binomial parameter, to 1 so that my model is reduced to bernoulli or binary data model.
 I generate 400 data points in $[0,1]\times[0,1] \in \mathcal{R}^2\times\mathcal{R}^2$
 following the GP with an exponential covariance structure (for latent variable) and bernoulli (for observable response variable).
-with some parameter values which I choose.
-And using Bayesian approach which uses the (normal \& inverse gamma)-GP-bernoulli hierarchical model and
-MCMC algorithm provided by Nimble, re-fit the parameters.
+with parameter values which I choose, $\beta_1=0, \beta1=1, \beta2=1, \sigma^2=0.1, \rho=0.1$.
+And using Bayesian approach with the (normal \& inverse gamma)-GP-bernoulli hierarchical model and
+MCMC algorithm provided by Nimble, get samples of posterior distributions of the parameters.
 
 Here is a part of my R-Nimble code of declaring model and run MCMC.
-I run 200,000 MCMC iterations.
+I run 200,000 iterations.
 \begin{Rcode}
     \begin{verbatim}
 model_string = nimbleCode({
@@ -296,7 +298,9 @@ ptFinal = proc.time()-pt
 In my computer, the elapsed time for running MCMC is 55 min 58 sec.
 
 I cut the first 10000 samples for burn-in, and keep 190000 samples.
-(in fact, I should cut more, but to show the convergence on trace plot, I cut only 10000 samples.)
+(In fact, I should cut more if considering the result of diagnostic plots below,
+but now because I want to show you the raw result of MCMC and convergence on trace plot, 
+I cut only 10000 samples.)
 
 Below are summary things.
 \begin{verbatim}
@@ -337,15 +341,19 @@ each parameter.
 \end{figure}
 \clearpage
 
-You may evaluate the results as something problematic when you see 
-high autocorrelation among samples, and traceplot of each parameter, especially of $\rho$.
+When seeing results of traceplot, $\beta$s and $\sigma^2$ converge quite well.
+But you may evaluate the results as something problematic when you see 
+high autocorrelation among samples, and traceplot especially of $\rho$.
 
-In general, however, sampling from complex distributions needs very long-iteration and
-very high thinning lag for proper acf. But now, I do just 200,000 iteration and don't do thinning.
+In general, however, MCMC sampling from a complex distribution needs very long-iteration and
+very high-level-lag thinning for proper acf. But now, I do just 200,000 iterations and don't do thinning.
+If I do those additionally, the result may be better.
 
-And in common, parameters related to variance is quite difficult to converge,
-even in basic normal-normal hierarchical model. And so does our case.
-If I simulate at better situation, (for example, with more data),
-I will make the convergence better and get better traceplots for all parameters.
+And in common, parameters related to variance are quite difficult to converge,
+even in basic normal-normal hierarchical model. 
+Thus, like our spatial model, for the cases that posterior has dependency 
+or complex structure, the convergence becomes more difficult thing.
+So above results, on the whole, may be admissible and tolerated.
+
 
 \end{document}
