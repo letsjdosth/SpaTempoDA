@@ -114,7 +114,7 @@ By Bayes theorem, the pdf of the joint posterior becomes
 \[\propto N(\eta,\tau^2I) * GP(X'\beta, \sigma^2 K(\rho))
     * N(m_\beta,v_\beta) * InvGamma(a_\sigma^2, b_\sigma^2) * InvGamma(a_\tau^2, b_\tau^2)
     * Gamma(a_\rho, b_\rho) \]
-\[\propto (\frac{1}{\tau^2})^n e^{-\frac{(Y-\eta)^2}{2\tau^2}}
+\[\propto (\frac{1}{\tau})^n e^{-\frac{(Y-\eta)^2}{2\tau^2}}
     * (\frac{1}{(\sigma^2 K(\rho))^{\frac{1}{2}}})^n e^{-\frac{(\eta-X'\beta)^2}{2\sigma^2 K(\rho)}}
     * e^{-\frac{(\beta-m_\beta)^2}{2v_\beta^2}}
     * (\sigma^2)^{-a_{\sigma^2}-1} e^{-\frac{b_{\sigma^2}}{\sigma^2}}
