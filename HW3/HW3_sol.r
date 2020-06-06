@@ -1,3 +1,8 @@
+# R code created by Choi Seokjun
+# UTF-8 CRLF
+# windows 10 64-bit.
+# R 3.6.3
+
 library(sp)
 library(spdep)
 library(classInt)
