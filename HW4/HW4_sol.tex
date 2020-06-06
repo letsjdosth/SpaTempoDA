@@ -202,7 +202,7 @@ Note that, this result is different as above rectangular window case,
 especially when I use the F function for making envelopes and empirical CDFs.
 This difference may be come from the property of the empty space distance
 underlying F function, i.e. for a set of locations or grids $\{u_j\}_{j=1}^{N}$ at empty space,
-\[\hat{F}(r) = \frac{\sum_{j=1}^{n} 1\{d(u_j, x_i)\leq x\}}{n}\]
+\[\hat{F}(r) = \frac{\sum_{j=1}^{n} 1\{min_{i} ||u_j - x_i||\leq x\}}{n}\]
 for data point $\{x_i\}$s. 
 When I use the rectangular window based on ranges of x and y,
 the empty area is large, so that the grid points $\{u_j\}_{j=1}^{N}$ tend to
@@ -280,6 +280,7 @@ model 2:
 \[\lambda(x) = \beta Z(x)\]
 Plot a kernel density estimate of $\lambda(x)$ without covariates as well as the fitted intensities under the two models.
 }
+
 In the beginning, let us see the data.
 \begin{figure}[!h]
     \centering
