@@ -6,7 +6,6 @@
 
 library(spatstat)
 
-#
 data(bei)
 plot(bei)
 
@@ -16,7 +15,8 @@ filename = paste("C:/gitProject/SpaTempoDA/HW4/prob3_bei.png",sep="")
 dev.copy(png,filename=filename)
 dev.off()
 
-plot(density(bei, sigma = bw.scott(bei)))
+zlim_set = c(0, 0.025)
+plot(density(bei, sigma = bw.scott(bei)), main="no covariates", zlim=zlim_set)
 points(bei, pch = 20, cex=0.25)
 filename = paste("C:/gitProject/SpaTempoDA/HW4/prob3_intensity_nocovariates.png",sep="")
 dev.copy(png,filename=filename)
@@ -34,11 +34,11 @@ dev.copy(png,filename=filename)
 dev.off()
 
 
-
 # model 1
 grad = bei.extra$grad
 fit.model1 = ppm(bei, ~slope, covariates=list(slope=grad))
-# > ppm(bei, ~slope, covariates=list(slope=grad))
+
+# ppm(bei, ~slope, covariates=list(slope=grad))
 # Nonstationary Poisson process
 
 # Log intensity:  ~slope
@@ -50,14 +50,17 @@ fit.model1 = ppm(bei, ~slope, covariates=list(slope=grad))
 #              Estimate       S.E.   CI95.lo   CI95.hi Ztest      Zval
 # (Intercept) -5.391053 0.03001787 -5.449887 -5.332219   *** -179.5948
 # slope        5.026710 0.24534296  4.545847  5.507573   ***   20.4885
-# => λ(u) = exp(−5.391053 + 5.026710 Z(u)). 
 
-plot(fit.model1, how = "image", se = FALSE)
+# => lambda(u) = exp(-5.391053 + 5.026710 Z(u))
+
+
+
+plot(fit.model1, how = "image", se = FALSE, main="model1 fit", zlim=zlim_set)
 filename = paste("C:/gitProject/SpaTempoDA/HW4/prob3_model1_fit.png",sep="")
 dev.copy(png,filename=filename)
 dev.off()
 
-plot(predict(fit.model1, type="cif", ngrid=2^10))
+plot(predict(fit.model1, type="cif", ngrid=2^10), main="model1 predicted", zlim=zlim_set)
 points(bei, pch = 20, cex=0.25)
 filename = paste("C:/gitProject/SpaTempoDA/HW4/prob3_model1_predict.png",sep="")
 dev.copy(png,filename=filename)
@@ -69,14 +72,14 @@ dev.off()
 fit.model2 = ppm(bei, ~offset(log(slope)), covariates = list(slope = grad))
 #              Estimate       S.E.   CI95.lo   CI95.hi Ztest      Zval
 # (Intercept) -2.427165 0.01665742 -2.459813 -2.394517   *** -145.7108
-# => λ(u) = exp(-2.427165)Z(u) = 0.08828677 Z(u)
+# => lambda(u) = exp(-2.427165)Z(u) = 0.08828677 Z(u)
 
-plot(fit.model2, how = "image", se = FALSE)
+plot(fit.model2, how = "image", se = FALSE, main="model2 fit", zlim=zlim_set)
 filename = paste("C:/gitProject/SpaTempoDA/HW4/prob3_model2_fit.png",sep="")
 dev.copy(png,filename=filename)
 dev.off()
 
-plot(predict(fit.model2, type="cif", ngrid=256))
+plot(predict(fit.model2, type="cif", ngrid=256), main="model2 predicted", zlim=zlim_set)
 points(bei, pch = 20, cex=0.25)
 filename = paste("C:/gitProject/SpaTempoDA/HW4/prob3_model2_predict.png",sep="")
 dev.copy(png,filename=filename)
