@@ -11,6 +11,11 @@ data(bei)
 plot(bei)
 
 # bw.scott(bei) #76.80943 41.01130
+plot(bei)
+filename = paste("C:/gitProject/SpaTempoDA/HW4/prob3_bei.png",sep="")
+dev.copy(png,filename=filename)
+dev.off()
+
 plot(density(bei, sigma = bw.scott(bei)))
 points(bei, pch = 20, cex=0.25)
 filename = paste("C:/gitProject/SpaTempoDA/HW4/prob3_intensity_nocovariates.png",sep="")
@@ -20,6 +25,9 @@ dev.off()
 
 head(bei.extra)
 plot(bei.extra$elev)
+filename = paste("C:/gitProject/SpaTempoDA/HW4/prob3_elev.png",sep="")
+dev.copy(png,filename=filename)
+dev.off()
 plot(bei.extra$grad)
 filename = paste("C:/gitProject/SpaTempoDA/HW4/prob3_grad.png",sep="")
 dev.copy(png,filename=filename)
