@@ -27,13 +27,13 @@ sim3 = hom_pois_process_generator2(100)
 sim4 = hom_pois_process_generator2(100)
 
 plot_function = function(ppp.sim, main=""){
-    plot(ppp.sim, main=main, pch = 19)
+    plot(ppp.sim, main=main, pch = 20)
     filename = paste("C:/gitProject/SpaTempoDA/HW4/prob2_",main,"_scatterplot.png",sep="")
     dev.copy(png,filename=filename)
     dev.off()
 
-    plot(density(sim1, sigma = 10), main=main)
-    points(sim1, pch = 20, cex=0.25)
+    plot(density(ppp.sim, sigma = 10), main=main)
+    points(ppp.sim, pch = 20, cex=0.25)
     filename = paste("C:/gitProject/SpaTempoDA/HW4/prob2_",main,"_ker.png",sep="")
     dev.copy(png,filename=filename)
     dev.off()
