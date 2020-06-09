@@ -45,7 +45,7 @@ You can get full code files at my github page: Visit https://github.com/letsjdos
 and see "HW4" directory. Because I provide the full code separately, in this report 
 I will show key code blocks only, instead of the whole, verbose code.
 
-\section{Problem1}
+\section{Problem 1}
 \textbf{
 Alt and Vach (1991) describe an archaeological investigation of an early medieval burial ground in Germany.
 One question of interest was whether grave sites tended to be place according to family units.
@@ -196,20 +196,21 @@ Here are result plots.
 \end{figure}
 
 In this case, all estimated CDFs are on the envelopes constructed by MC simulation under CSR model.
-So, I have no evidence that the data is against CSR.
+So, I get no evidence which the data have against CSR.
 
 Note that, this result is different as above rectangular window case,
 especially when I use the F function for making envelopes and empirical CDFs.
 This difference may be come from the property of the empty space distance
-underlying F function, i.e. for a set of locations or grids $\{u_j\}_{j=1}^{N}$ at empty space,
+underlying F function, i.e. for a set of locations or grids $\{u_j\}_{j=1}^{N}$ at non-data points,
 \[\hat{F}(r) = \frac{\sum_{j=1}^{n} 1\{min_{i} ||u_j - x_i||\leq x\}}{n}\]
-for data point $\{x_i\}$s. 
+for data-points, $\{x_i\}$.
 When I use the rectangular window based on ranges of x and y,
-the empty area is large, so that the grid points $\{u_j\}_{j=1}^{N}$ tend to
-be located in these empty area. In contrast, when I use the polygon-shaped area,
-the empty area is relatively small than the case when I use the rectangular window.
-This difference yields that the values of empty space distance tend to be bigger with the rectangular window
-than with the polygon-shaped window, and as a result, pushes the empirical CDFs up.
+the empty area is large so that the grid points $\{u_j\}_{j=1}^{N}$ tend to
+be located in the empty area. In contrast, when I use the polygon-shaped area,
+the empty area is deleted and remaining margin is relatively smaller than the case when I use the rectangular window
+so that $\{u_j\}_{j=1}^{N}$ cannot be located in an such empty area like the rectangular case.
+This difference yields that the value of empty space distance at arbitrary $u_j$ tends to be less with the polygon-shaped window
+than with the rectangular window, and as a result, pushes the empirical CDFs with polygon-shaped down.
 Also note that, this kind of effect is weak when I use G function which is defined with the nearest-neighbor distance,
 thus the differences with G function between the case of the rectangular window and of the polygon-shaped window are smaller
 than those with F function.
@@ -217,14 +218,14 @@ than those with F function.
 
 
 \clearpage
-\section{Problem2}
+\section{Problem 2}
 \textbf{
 Simulate four datasets on the unit square, from a homogenous Poisson process with a rate $\lambda$ of your choosing.
 For each one, fit a kernel estimate of the intensity function and plot it with the points overlaid.
 }
 
 Using below R functions, I will generate four dataset on the unit square following a homogenous Poisson process.
-(Two functions are basically same, but upper one shows the  procedure in detail.)
+(Two functions are basically same, but upper one shows a procedure in detail.)
 
 \begin{Rcode}
     \begin{verbatim}
@@ -244,8 +245,8 @@ hom_pois_process_generator2 = function(intensity){
     \end{verbatim}
 \end{Rcode}
 
-I choose the intensity $\lambda=100$.
-And, after generating each one, I estimate the intensity functions using kernel.
+I choose the intensity $\lambda=100$ and generate processes.
+After generating each one, I estimate the intensity functions using Gaussian kernel.
 The result plots are below.
 
 \begin{figure}[!h]
@@ -263,14 +264,14 @@ The result plots are below.
     lower-left: simulation case 3, lower-right: simulation case 4}
 \end{figure}
 
-Since I use gaussian kernel to estimate the intensity functions, 
+Since I select Gaussian kernel to estimate the intensity functions, 
 the estimated results are depend on realization of each randomly (uniformly) located points,
-highest at area in which many points realized by chance, and gradually decreased as being far from the highest point.
-Thus, the difference among the four estimated intensity functions are totally by chance.
+having peak intensity at area in which many points realized by chance, and gradually decreased as being far from the highest point.
+In summary, the difference among the four estimated intensity functions are totally by chance.
 
 
 \clearpage
-\section{Problem3}
+\section{Problem 3}
 \textbf{
 Read through section 15.2 and 15.3 of the notes by Adrian Baddeley, and
 find MLEs for inhomogeneous models with intensity functions:
@@ -347,17 +348,17 @@ Model 2:
 \end{figure}
 
 \clearpage
-Note that I use same scale for above five 2d-density plots.
+Note that I use same color-scale for above five 2d-density plots.
 
-When observing the plots, I can find that for model 1 and model 2,
+When observing the plots, we can find that for both model 1 and model 2,
 the grad variable affects seriously to fitted results. 
-Overall forms of model 1 and model 2 are similar to of grad so that the lower-right area has high intensity,
+If I more elaborate the results, the overall forms of both estimated intensity function of model 1 and model 2 are similar to of grad, the lower-right area has high intensity,
 while the upper-left area has relatively lower, despite many points in there.
 But it is natural result, because the models does not include other covariates like x-coordinate or y-coordinate,
-but only grad variable. Thus the intensity cannot differ with form of grad.
+but only the grad variable. Thus the intensity cannot differ with form of the grad by the specification of model.
 If you compare these result to no covariate case (just gaussian kernel fit), this point is shown more remarkably.
 
-Next, when we search for a difference between results of model 1 and of model 2,
+Also note that, when we search for a difference between results of model 1 and of model 2,
 we just find it in a view of overall level. It is because the model differs only on whether the model includes intercept or not.
 
 \end{document}
