@@ -55,7 +55,7 @@ I will start from the simplistic case which assumes isotropy, separable and symm
 and will remove each one, with introducing new concepts and more general covariance structure.
 \begin{definition}
     Assume second-stationary spatial process and let C(h) be the covariance function of the process, where $h\in\mathbb R^n$ is space-lag.
-    $C$ is isotopic if $C(h)=C(||h||)$, where $||\cdot||$ is norm of the domain.
+    $C$ is isotropic if $C(h)=C(||h||)$, where $||\cdot||$ is norm of the domain.
     $C$ is symmetric if $C(h)=C(-h)$.
 \end{definition}
 \begin{definition}
@@ -78,7 +78,7 @@ More detailed version is here.
     \[c(h)=2^{(m-2)/2} \Gamma(m/2) \int_0^\infty \frac{J_{(m-2)/2}(\omega h)}{(\omega h)^{(m-2)/2}}dF(\omega), h\geq 0\]
     where $h$ is norm of space-lag vector and $J_(.)$ is the Bessel function of order $(.)$.
 \end{theorem}
-This theorem specifies the structure totally. So, the story related to constructing isotopic covariance for spatial data is finished.
+This theorem specifies the structure totally. So, the story related to constructing isotropic covariance for spatial data is finished.
 
 
 
@@ -136,7 +136,7 @@ The proof depends on the Maxwell's theorem in probability theory and statistical
 But idea is here: only rotationally invariant probability distribution on $\mathbb R^d$ that have independent component are multivariate normal distribution with expected value $0$ and variance $\sigma I_d, \sigma>0$.
 (Feller, 1966)
 
-The above class is too narrow to fit diversely-correlated data. So, I explore more general structure beyond the isotopic-separable condition.
+The above class is too narrow to fit diversely-correlated data. So, I explore more general structure beyond the isotropic-separable condition.
 Unfortunately(maybe fortunately to you), however, central results related to non-separable covariances are introduced in Park's lecture,
 so in this section, I introduce more detail process to draw them.
 
