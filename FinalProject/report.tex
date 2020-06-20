@@ -63,7 +63,7 @@ and will remove each one, with introducing new concepts and more general covaria
     C is separable if $C(h,u)=C_1(h)C_2(u)$ for some $C_1$ and $C_2$.
 \end{definition}
 
-\section{Isotopy-related issues}
+\section{Isotropy-related issues}
 \subsection{For only spatial (no temporal part) data}
 Assume that we work with second-order stationary random field.
 First, here is classical method to construct isotropic covariance without proof.
@@ -82,7 +82,7 @@ This theorem specifies the structure totally. So, the story related to construct
 
 
 
-\subsection{Expand the notion of isotopy to spatio-temporal data}
+\subsection{Expand the notion of isotropy to spatio-temporal data}
 It is obviously unreasonable to deal time axis and space axises as entirely same things because their measurement unit and permitted domain are totally different.
 So, different definitions for covariance of space-time data are proposed. 
 
@@ -101,13 +101,13 @@ as long as keeping positive-definiteness.
 
 
 \subsection{anisotropic covariances}
-Many researchers try to construct covariance function outside isotopy. Here are developed concepts.
+Many researchers try to construct covariance function outside isotropy. Here are developed concepts.
 All things assumes that second-order stationary random field. Let $h$ be lag-vector and $C_0,C_1,C_2$ be some covariance functions.
 \begin{itemize}
     \item (geometric anisotropic covariance) $C(h)=C_0(||LH||)$ where $L:=RD$, $D$ is diagonal matrix for scaling, $R$ is rotation matrix.
     \item (zonal anisotropic covariance) $C(h)=C_1(h_1)+C_2(h_2)$ where $h=(h_1,h_2)$.
 \end{itemize}
-For first case, it allows direction-by-direction non-isotopy. (For detect this, you may use directional variogram. See Allard et al.(2016))
+For first case, it allows direction-by-direction non-isotropy. (For detect this, you may use directional variogram. See Allard et al.(2016))
 To construct geometric anisotropic covariance, you can just multiply the isotropic covariance to anisotropic covariance function.
 Many things are constructed by this manner. Note that if you multiply two anisotropic one, nothing is guaranteed. There are both cases to get isotropic one and not to.
 See $C_1(h_1,h_2)=e^{-a_1 h_1^2-a_2 h_2^2}$ and $C_2(h_1,h_2)=a_1' h_1^2-a_2' h_2^2$, where $a_1\neq a_1', a_2 \neq a_2'$, $a_1,a_2,a_1',a_2'>0$.
